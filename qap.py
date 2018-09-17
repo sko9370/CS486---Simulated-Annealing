@@ -137,8 +137,6 @@ def init_temperature(locations, flows, init_accept_rate):
 
     return -(avg_delta_E) / math.log(init_accept_rate)
 
-def loop(locations)
-
 def main():
     """
     Program entry point. Parses command line arguments and contains the main
@@ -159,22 +157,18 @@ def main():
     accepted = 0
     attempted = 0
     first = True
+    least = 1000
     # degree of freedom, parameters??
     N = 15
 
     while stage_fail < 3:
         total_cost = cost(locations, flows)
         r1, c1, r2, c2 = move(locations)
-        swap(locations, r1, c1, r2, c2)
         new_cost = cost(locations, flows)
 
-        least = 0
-        if first:
-            least = new_cost
-
-        elif new_cost < total_cost:
+        if new_cost < total_cost:
             accepted += 1
-            history.append(new_cost)
+            least = new_cost
 
         else:
             # Acceptance rule of Metropolis
@@ -186,10 +180,9 @@ def main():
             # if good temperature, continue
             if r < accept:
                 attempted += 1
-                pass
-
-            # if bad temperature, return old locations
-            swap(locations, r2, c2, r1, c1)
+            else:
+                attempted += 1
+                swap(locations, r2, c2, r1, c1)
 
         # decrease temperature; can use 0.9 old_temp = new_temp
         if attempted == 100*N or accepted == 12*N:
