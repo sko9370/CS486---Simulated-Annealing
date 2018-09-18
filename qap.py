@@ -151,30 +151,35 @@ def main():
     locations = init_locations(flows)
 
     # Implement SA algorithm here
-    temperature = init_temperature(locations, flows, 0.5)
+    tau = input("Choose a value from 0.2 (good initial config) to 0.5 (bad initial config): ")
+    if tau == "":
+        tau = 0.5
+    temperature = init_temperature(locations, flows, float(tau))
+    N = input("Change N (number of parameters) if you'd like: ")
+    if N == "":
+        N = 15
+    print("calculating...")
+
     failed_temps = 0
     stage_fail = 0
     accepted = 0
     attempted = 0
     first = True
     least = 1000
-    # degree of freedom, parameters??
-    N = 15
 
     while stage_fail < 3:
-        total_cost = cost(locations, flows)
+        current_cost = cost(locations, flows)
         r1, c1, r2, c2 = move(locations)
         new_cost = cost(locations, flows)
 
-        if new_cost < total_cost:
+        if new_cost < current_cost:
             accepted += 1
             least = new_cost
 
         else:
             # Acceptance rule of Metropolis
-            change_E = new_cost - total_cost
-            accept = math.exp( -(change_E)/temperature )
-            # -(avg_delta_E) / math.log(init_accept_rate)
+            change_E = new_cost - current_cost
+            accept = math.exp( -(change_E) / temperature )
             # R random from [0,1]
             r = random.random()
             # if good temperature, continue
@@ -187,10 +192,13 @@ def main():
         # decrease temperature; can use 0.9 old_temp = new_temp
         if attempted == 100*N or accepted == 12*N:
             temperature = 0.9 * temperature
+            # check if failed this round
             if accepted == 0:
                 stage_fail += 1
+            # reset stage_fail if not consecutive fails
             else:
                 stage_fail = 0
+            # reset values
             attempted = 0
             accepted = 0
 
