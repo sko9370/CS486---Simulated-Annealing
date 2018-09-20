@@ -7,6 +7,15 @@ Modified for AI class on 9 Sep 2018
 Solve QAP using simulated annealing.
 '''
 
+'''
+https://sebastianraschka.com/Articles/2014_multiprocessing.html#introduction-to-the-multiprocessing-module
+I read how to use multiprocessing and used the code from the library to define a queue and
+make a list of processes. I ended up not using it though... It was taking too long
+and I had other stuff to study.
+'''
+
+import multiprocessing as mp
+
 import copy
 import math
 import random
@@ -151,20 +160,27 @@ def main():
     locations = init_locations(flows)
 
     # Implement SA algorithm here
+
     tau = input("Choose a value from 0.2 (good initial config) to 0.5 (bad initial config): ")
     if tau == "":
         tau = 0.5
+
+    #tau = 0.5
     temperature = init_temperature(locations, flows, float(tau))
+
     N = input("Change N (number of parameters) if you'd like: ")
     if N == "":
         N = 15
+    else:
+        N = int(N)
     print("calculating...")
+
+    #N = 15
 
     failed_temps = 0
     stage_fail = 0
     accepted = 0
     attempted = 0
-    first = True
     least = 1000
 
     while stage_fail < 3:
@@ -174,6 +190,14 @@ def main():
 
         if new_cost < current_cost:
             accepted += 1
+            '''
+            Seo, Steve H-4 '19. 2018 Sep 19. Assistance given to the author, verbal discussion.
+            CDT Seo told me that he thought that this if statement should also
+            increment attempted counts instead of just accepted counts as I had
+            before. Although the effect is minimal and possibly not always positive,
+            I think this is how you should count accepts and attempts. West Point, NY.
+            '''
+            attempted += 1
             least = new_cost
 
         else:
@@ -206,4 +230,21 @@ def main():
     return least
 
 if __name__ == '__main__':
+    '''
+    output = mp.Queue()
+    processes = [mp.Process(target = main(), args = ()) for x in range(3)]
+
+    for p in processes:
+        p.start()
+
+    for p in processes:
+        p.join()
+
+    results = [output.get() for p in processes]
+    least = min(results)
+
+    # least = min(least1, least2, least3, least4, least5)
+    print(least)
+    '''
+    # I tried to make it cool but I don't have enough time.
     main()
